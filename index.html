@@ -15,11 +15,18 @@
             <span class="logo-icon"></span>
             SOLARIS
         </div>
-        <nav class="nav-links">
-            <a href="#overview" class="active">Обзор</a>
-            <a href="#timeline">Интерактивное демо</a>
-            <a href="#slides">Презентация</a>
-            <a href="#technical">Характеристики</a>
+        
+        <button class="menu-toggle" id="menu-toggle" aria-label="Открыть меню">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <nav class="nav-links" id="nav-links">
+            <a href="#overview" class="active" onclick="toggleMenu(false)">Обзор</a>
+            <a href="#timeline" onclick="toggleMenu(false)">Интерактивное демо</a>
+            <a href="#slides" onclick="toggleMenu(false)">Презентация</a>
+            <a href="#technical" onclick="toggleMenu(false)">Характеристики</a>
         </nav>
     </header>
 
@@ -27,6 +34,7 @@
         <!-- Секция Hero -->
         <section id="overview" class="hero">
             <div class="hero-content">
+                <span class="hero-tag">Архитектурная 3D-визуализация</span>
                 <h1>Программная интеграция солнечной кровли</h1>
                 <p>Автоматизированная высокодетализированная 3D-концепция плоской бетонной крыши с оптимизированной сеткой солнечных панелей. Проект полностью запрограммирован на Python, анимирован и отрендерен с помощью физически корректного движка Cycles GPU.</p>
                 <a href="#slides" class="btn-primary" id="view-presentation-btn">Открыть презентацию</a>
@@ -248,6 +256,25 @@
         function setSlide(index) {
             currentSlideIndex = index;
             updateSlide();
+        }
+
+        // --- 3. Мобильное меню (Гамбургер) ---
+        const menuToggle = document.getElementById('menu-toggle');
+        const navLinks = document.getElementById('nav-links');
+
+        menuToggle.addEventListener('click', () => {
+            const isOpen = navLinks.classList.contains('open');
+            toggleMenu(!isOpen);
+        });
+
+        function toggleMenu(open) {
+            if (open) {
+                navLinks.classList.add('open');
+                menuToggle.classList.add('open');
+            } else {
+                navLinks.classList.remove('open');
+                menuToggle.classList.remove('open');
+            }
         }
     </script>
 </body>

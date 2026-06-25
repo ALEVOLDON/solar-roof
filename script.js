@@ -96,6 +96,15 @@ function toggleMenu(open) {
     menuToggle.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
 }
 
+function preloadSlides() {
+    const preloadedImages = [];
+    for (let index = 0; index < TOTAL_SLIDES; index += 1) {
+        const img = new Image();
+        img.src = getSlidePath(index);
+        preloadedImages.push(img);
+    }
+}
+
 function initCarousel() {
     if (!indicatorsContainer) return;
 
@@ -187,6 +196,7 @@ function initReducedMotionListener() {
 }
 
 initCarousel();
+preloadSlides();
 initVideo();
 initNavigation();
 initReducedMotionListener();

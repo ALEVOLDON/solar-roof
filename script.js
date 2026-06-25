@@ -62,54 +62,67 @@ function updateSlide() {
 
     const outClass = slideDirection > 0 ? 'slide-out-left'  : 'slide-out-right';
     const inClass  = slideDirection > 0 ? 'slide-in-right'  : 'slide-in-left';
+    const newSrc   = getSlidePath(currentSlideIndex);
+    const newAlt   = `Слайд презентации проекта ${currentSlideIndex + 1} из ${TOTAL_SLIDES}`;
 
-    // Update dot indicators immediately (no need to wait for animation)
+    // Update dot indicators immediately
     document.querySelectorAll('.indicator').forEach((indicator, index) => {
         indicator.classList.toggle('active', index === currentSlideIndex);
         indicator.setAttribute('aria-selected', index === currentSlideIndex ? 'true' : 'false');
     });
 
-    // Skip animation when reduced motion is preferred
     if (prefersReducedMotion) {
-        slideImg.src = getSlidePath(currentSlideIndex);
-        slideImg.alt = `Слайд презентации проекта ${currentSlideIndex + 1} из ${TOTAL_SLIDES}`;
+        slideImg.src = newSrc;
+        slideImg.alt = newAlt;
         isAnimating = false;
         return;
     }
 
-    // Step 1: animate current slide out
+    // --- Key fix for Android jank ---
+    // Pre-decode the next image in a background thread WHILE the exit animation runs.
+    // By the time the exit animation finishes, the image is already decoded and
+    // setting img.src won't block the main thread.
+    const preloadImg = new Image();
+    preloadImg.src = newSrc;
+    const imageReady = preloadImg.decode().catch(() => { /* ignore decode errors */ });
+
+    // Start exit animation
     slideImg.classList.add(outClass);
 
-    slideImg.addEventListener('animationend', () => {
+    // Wait for exit animation to finish (with a timeout safety net for Android)
+    const animOutDone = new Promise(resolve => {
+        const timer = setTimeout(resolve, 300); // fallback if animationend doesn't fire
+        slideImg.addEventListener('animationend', () => {
+            clearTimeout(timer);
+            resolve();
+        }, { once: true });
+    });
+
+    // Only proceed when BOTH: exit animation done AND image decoded
+    Promise.all([animOutDone, imageReady]).then(() => {
         slideImg.classList.remove(outClass);
+        slideImg.src = newSrc;
+        slideImg.alt = newAlt;
 
-        // Step 2: swap image source
-        slideImg.src = getSlidePath(currentSlideIndex);
-        slideImg.alt = `Слайд презентации проекта ${currentSlideIndex + 1} из ${TOTAL_SLIDES}`;
+        // Double rAF: first frame commits the src swap to layout,
+        // second frame starts the entrance animation cleanly
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                slideImg.classList.add(inClass);
 
-        const animateIn = () => {
-            slideImg.classList.add(inClass);
-            slideImg.addEventListener('animationend', () => {
-                slideImg.classList.remove(inClass);
-                isAnimating = false;
-            }, { once: true });
-        };
+                const timer = setTimeout(() => {
+                    slideImg.classList.remove(inClass);
+                    isAnimating = false;
+                }, 400); // fallback
 
-        // Step 3: animate in — handle both cached and fresh images
-        if (slideImg.complete && slideImg.naturalWidth > 0) {
-            animateIn();
-        } else {
-            slideImg.onload = () => {
-                slideImg.onload = null;
-                animateIn();
-            };
-            // Safety fallback if load event never fires (e.g. error)
-            slideImg.onerror = () => {
-                slideImg.onerror = null;
-                isAnimating = false;
-            };
-        }
-    }, { once: true });
+                slideImg.addEventListener('animationend', () => {
+                    clearTimeout(timer);
+                    slideImg.classList.remove(inClass);
+                    isAnimating = false;
+                }, { once: true });
+            });
+        });
+    });
 }
 
 function changeSlide(direction) {
@@ -144,6 +157,28 @@ function preloadSlides() {
         img.src = getSlidePath(index);
         preloadedImages.push(img);
     }
+}
+
+function initTouchSwipe() {
+    const container = document.querySelector('.carousel-container');
+    if (!container) return;
+
+    let startX = 0;
+    let startY = 0;
+
+    container.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    container.addEventListener('touchend', (e) => {
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        // Swipe only if horizontal movement > 50px and more horizontal than vertical
+        if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+            changeSlide(dx < 0 ? 1 : -1);
+        }
+    }, { passive: true });
 }
 
 function initCarousel() {
@@ -237,6 +272,7 @@ function initReducedMotionListener() {
 }
 
 initCarousel();
+initTouchSwipe();
 preloadSlides();
 initVideo();
 initNavigation();

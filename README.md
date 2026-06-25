@@ -2,7 +2,7 @@
 
 🌐 **Живое демо:** [alevoldon.github.io/solar-roof](https://alevoldon.github.io/solar-roof/)
 
-![Превью проекта Solaris](slides/slide_1.webp)
+![Превью проекта Solaris](render/video_poster.webp)
 
 Интерактивная 3D-презентация и автоматизированная визуализация плоской бетонной крыши с оптимизированной сеткой солнечных панелей.
 
@@ -70,7 +70,9 @@ solar_roof/
 ├── Programmatic_Solar_Photorealism.pdf
 ├── slides/                             # Слайды (PNG + WebP)
 └── render/
-    └── solar_roof_0001-0360.mp4       # Отрендеренная анимация
+    ├── solar_roof_0001-0360.mp4       # Отрендеренная анимация (12 сек, H.264)
+    ├── video_poster.webp               # Превью-кадр из анимации (WebP, ~16 КБ)
+    └── video_poster.jpg                # Превью-кадр из анимации (JPEG, fallback)
 ```
 
 ---

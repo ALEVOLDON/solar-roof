@@ -490,7 +490,7 @@ def configure_gpu_devices(cycles_preferences: Any) -> None:
     for device in cycles_preferences.devices:
         device.use = device in enabled_devices
 
-    preferred = next((d for d in enabled_devices if "3050" in d.name), enabled_devices[0])
+    preferred = enabled_devices[0]
     print(f"Using Cycles GPU backend: {cycles_preferences.compute_device_type} ({preferred.name})")
 
 

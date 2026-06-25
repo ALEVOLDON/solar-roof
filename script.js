@@ -97,6 +97,9 @@ function toggleMenu(open) {
 }
 
 function preloadSlides() {
+    // Don't preload unnecessarily when the user has requested reduced data usage
+    if (prefersReducedMotion) return;
+
     const preloadedImages = [];
     for (let index = 0; index < TOTAL_SLIDES; index += 1) {
         const img = new Image();

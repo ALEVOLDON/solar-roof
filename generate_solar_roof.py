@@ -61,7 +61,10 @@ def setup_world_lighting() -> None:
     background = nodes.new(type="ShaderNodeBackground")
     sky = nodes.new(type="ShaderNodeTexSky")
 
-    sky.sky_type = "NISHITA"
+    try:
+        sky.sky_type = "SINGLE_SCATTERING"
+    except TypeError:
+        sky.sky_type = "NISHITA"
     sky.sun_elevation = math.radians(35)
     sky.sun_rotation = math.radians(180)
     background.inputs["Strength"].default_value = 0.35
@@ -498,6 +501,7 @@ def configure_render_settings() -> None:
 
     scene.render.engine = "CYCLES"
     scene.cycles.device = "GPU"
+    scene.render.use_sequencer = False
 
     scene.cycles.use_adaptive_sampling = True
     scene.cycles.adaptive_threshold = RENDER_NOISE_THRESHOLD
@@ -511,6 +515,10 @@ def configure_render_settings() -> None:
     scene.cycles.preview_adaptive_threshold = 0.1
     scene.cycles.preview_samples = VIEWPORT_SAMPLES
 
+    try:
+        scene.render.image_settings.media_type = 'VIDEO'
+    except AttributeError:
+        pass
     scene.render.image_settings.file_format = "FFMPEG"
     scene.render.ffmpeg.format = "MPEG4"
     scene.render.ffmpeg.codec = "H264"

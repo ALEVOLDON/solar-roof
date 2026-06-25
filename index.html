@@ -5,53 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Визуализация интеграции солнечных панелей</title>
     <meta name="description" content="Фотореалистичная программная 3D-визуализация плоской бетонной крыши с оптимизированной сеткой солнечных панелей. Разработано в Blender на Python с рендерингом в Cycles GPU.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:title" content="Solaris — программная интеграция солнечной кровли">
+    <meta property="og:description" content="3D-визуализация бетонной крыши с сеткой из 15 солнечных панелей. Python, Blender, Cycles GPU.">
+    <meta property="og:url" content="https://alevoldon.github.io/solar-roof/">
+    <meta property="og:image" content="https://alevoldon.github.io/solar-roof/slides/slide_1.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Solaris — программная интеграция солнечной кровли">
+    <meta name="twitter:description" content="3D-визуализация бетонной крыши с сеткой из 15 солнечных панелей.">
+    <meta name="twitter:image" content="https://alevoldon.github.io/solar-roof/slides/slide_1.webp">
+
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Шапка сайта -->
     <header>
         <div class="logo">
-            <span class="logo-icon"></span>
+            <span class="logo-icon" aria-hidden="true"></span>
             SOLARIS
         </div>
-        
-        <button class="menu-toggle" id="menu-toggle" aria-label="Открыть меню">
+
+        <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav-links">
             <span></span>
             <span></span>
             <span></span>
         </button>
-        
-        <nav class="nav-links" id="nav-links">
-            <a href="#overview" class="active" onclick="toggleMenu(false)">Обзор</a>
-            <a href="#timeline" onclick="toggleMenu(false)">Интерактивное демо</a>
-            <a href="#slides" onclick="toggleMenu(false)">Презентация</a>
-            <a href="#technical" onclick="toggleMenu(false)">Характеристики</a>
+
+        <nav class="nav-links" id="nav-links" aria-label="Основная навигация">
+            <a href="#overview" class="active">Обзор</a>
+            <a href="#timeline">Интерактивное демо</a>
+            <a href="#slides">Презентация</a>
+            <a href="#technical">Характеристики</a>
         </nav>
     </header>
 
     <main>
-        <!-- Секция Hero -->
         <section id="overview" class="hero">
             <div class="hero-content">
                 <span class="hero-tag">Архитектурная 3D-визуализация</span>
                 <h1>Программная интеграция солнечной кровли</h1>
                 <p>Автоматизированная высокодетализированная 3D-концепция плоской бетонной крыши с оптимизированной сеткой солнечных панелей. Проект полностью запрограммирован на Python, анимирован и отрендерен с помощью физически корректного движка Cycles GPU.</p>
-                <a href="#slides" class="btn-primary" id="view-presentation-btn">Открыть презентацию</a>
-            </div>
-            
-            <div class="video-container">
-                <div class="video-wrapper glass-panel">
-                    <video id="project-video" autoplay loop muted playsinline>
-                        <source src="render/solar_roof_0001-0360.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
+                <div class="hero-actions">
+                    <a href="#slides" class="btn-primary" id="view-presentation-btn">Открыть презентацию</a>
+                    <a href="#timeline" class="btn-secondary">Смотреть анимацию</a>
                 </div>
+            </div>
+
+            <div class="video-container">
+                <a href="#timeline" class="hero-video-link glass-panel" id="hero-video-link" aria-label="Перейти к интерактивной анимации">
+                    <picture>
+                        <source srcset="slides/slide_1.webp" type="image/webp">
+                        <img src="slides/slide_1.png" alt="Превью 3D-визуализации солнечной кровли" width="1280" height="720" loading="eager">
+                    </picture>
+                    <span class="hero-play-badge">▶ Смотреть демо</span>
+                </a>
             </div>
         </section>
 
-        <!-- Ключевые показатели -->
-        <section class="metrics">
+        <section class="metrics" aria-label="Ключевые показатели">
             <div class="metric-card glass-panel">
                 <div class="metric-value">60.18 м²</div>
                 <div class="metric-label">Общая площадь крыши</div>
@@ -69,30 +83,36 @@
             </div>
         </section>
 
-        <!-- Интерактивный таймлайн анимации -->
         <section id="timeline" class="interactive-timeline">
             <h2 class="section-title">Интерактивный таймлайн анимации</h2>
             <p class="section-subtitle">Нажмите на любой этап ниже, чтобы мгновенно перемотать видео на нужную фазу демонстрации проекта.</p>
-            
+
             <div class="timeline-showcase">
                 <div class="video-wrapper glass-panel">
-                    <video id="timeline-video" autoplay loop muted playsinline>
+                    <video
+                        id="project-video"
+                        controls
+                        loop
+                        muted
+                        playsinline
+                        preload="metadata"
+                        poster="slides/slide_1.webp"
+                    >
                         <source src="render/solar_roof_0001-0360.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
+                        Ваш браузер не поддерживает воспроизведение видео.
                     </video>
                 </div>
-                
-                <!-- Кнопки управления таймлайном -->
-                <div class="timeline-buttons">
-                    <button class="timeline-btn active" id="btn-stage-1" onclick="jumpToStage(0, this)">
+
+                <div class="timeline-buttons" role="tablist" aria-label="Этапы анимации">
+                    <button class="timeline-btn active" id="btn-stage-1" type="button" role="tab" data-seconds="0" aria-selected="true">
                         <span class="timeline-btn-title">01 / Поэтапная сборка</span>
                         <span class="timeline-btn-desc">Масштабирование плиты и последовательное появление панелей. (0–4 сек)</span>
                     </button>
-                    <button class="timeline-btn" id="btn-stage-2" onclick="jumpToStage(4.0, this)">
+                    <button class="timeline-btn" id="btn-stage-2" type="button" role="tab" data-seconds="4" aria-selected="false">
                         <span class="timeline-btn-title">02 / Облет камеры</span>
                         <span class="timeline-btn-desc">Круговой облет на 360° для детального осмотра конструкции ферм. (4–8 сек)</span>
                     </button>
-                    <button class="timeline-btn" id="btn-stage-3" onclick="jumpToStage(8.0, this)">
+                    <button class="timeline-btn" id="btn-stage-3" type="button" role="tab" data-seconds="8" aria-selected="false">
                         <span class="timeline-btn-title">03 / Анализ движения солнца</span>
                         <span class="timeline-btn-desc">Траектория солнца от рассвета до заката для оценки взаимных теней. (8–12 сек)</span>
                     </button>
@@ -100,32 +120,40 @@
             </div>
         </section>
 
-        <!-- Слайдер презентации -->
         <section id="slides" class="carousel-section">
             <h2 class="section-title">Слайды презентации проекта</h2>
             <p class="section-subtitle">Листайте слайды ниже, чтобы подробно ознакомиться с материалами, геометрией и конструктивными решениями.</p>
-            
+
             <div class="carousel-container">
-                <button class="carousel-btn carousel-prev" id="carousel-prev-btn" onclick="changeSlide(-1)">&#10094;</button>
-                
+                <button class="carousel-btn carousel-prev" id="carousel-prev-btn" type="button" aria-label="Предыдущий слайд">&#10094;</button>
+
                 <div class="slide-frame glass-panel">
-                    <img id="carousel-slide-img" src="slides/slide_1.png" alt="Слайд презентации проекта">
+                    <img
+                        id="carousel-slide-img"
+                        src="slides/slide_1.webp"
+                        alt="Слайд презентации проекта 1 из 12"
+                        width="1920"
+                        height="1080"
+                        loading="lazy"
+                        decoding="async"
+                    >
                 </div>
-                
-                <button class="carousel-btn carousel-next" id="carousel-next-btn" onclick="changeSlide(1)">&#10095;</button>
-                
-                <!-- Индикаторы слайдов -->
-                <div class="carousel-indicators" id="carousel-indicators-container">
-                    <!-- Заполняется динамически через JS -->
-                </div>
+
+                <button class="carousel-btn carousel-next" id="carousel-next-btn" type="button" aria-label="Следующий слайд">&#10095;</button>
+
+                <div class="carousel-indicators" id="carousel-indicators-container" role="tablist" aria-label="Индикаторы слайдов"></div>
+            </div>
+
+            <div class="download-links">
+                <a href="Programmatic_Solar_Photorealism.pdf" class="btn-secondary" download>Скачать PDF</a>
+                <a href="Programmatic_Solar_Photorealism.pptx" class="btn-secondary" download>Скачать PPTX</a>
             </div>
         </section>
 
-        <!-- Технические характеристики -->
         <section id="technical" class="tech-section">
             <h2 class="section-title">Технические характеристики</h2>
             <p class="section-subtitle">Проект сгенерирован автоматически с помощью Python и оптимизирован для физической точности в Cycles.</p>
-            
+
             <div class="tech-grid">
                 <div class="tech-card glass-panel">
                     <h3>Процедурные шейдеры</h3>
@@ -137,12 +165,12 @@
                         <li><strong>Galvanized_Rack:</strong> Промышленное защитное металлическое покрытие опорных рам.</li>
                     </ul>
                 </div>
-                
+
                 <div class="tech-card glass-panel">
                     <h3>Оптимизация под RTX GPU</h3>
                     <p>Сцена разработана для моментального просчета сложного освещения и трассированных теней:</p>
                     <ul class="tech-list">
-                        <li><strong>Аппаратное ускорение OptiX:</strong> Переключает вычисления на тензорные и RT-ядра видеокарты NVIDIA GeForce RTX 3050.</li>
+                        <li><strong>Аппаратное ускорение OptiX:</strong> Автоматически активирует совместимые GPU (OptiX, CUDA, HIP, Metal).</li>
                         <li><strong>Адаптивное сэмплирование:</strong> Рендеринг пикселя прекращается при достижении порога шума 0.05.</li>
                         <li><strong>Лимит сэмплов:</strong> Ограничен до 256, что позволяет быстро рассчитывать кадры без потери детализации.</li>
                         <li><strong>Denoising:</strong> Использование OpenImageDenoise для мгновенного сглаживания остаточных шумов Cycles.</li>
@@ -152,130 +180,24 @@
         </section>
     </main>
 
-    <!-- Подвал сайта -->
     <footer>
         <div class="footer-content">
             <div class="footer-logo">
-                <span class="logo-icon"></span>
+                <span class="logo-icon" aria-hidden="true"></span>
                 SOLARIS
             </div>
-            <p class="footer-copyright">© 2026 Проект Solaris. Разработано программно в Blender. Все права защищены.</p>
+            <p class="footer-copyright">© 2026 Проект Solaris. Разработано программно в Blender.</p>
+            <div class="footer-links">
+                <a href="https://github.com/ALEVOLDON/solar-roof" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://alevoldon.github.io/solar-roof/" target="_blank" rel="noopener noreferrer">Демо-сайт</a>
+                <a href="project_documentation.md">Документация (EN)</a>
+            </div>
             <div class="hardware-badge">
-                <span class="badge-icon">⚡</span> Работает на Cycles OptiX (RTX 3050)
+                <span class="badge-icon" aria-hidden="true">⚡</span> Работает на Cycles GPU (OptiX / CUDA)
             </div>
         </div>
     </footer>
 
-    <!-- Логика интерактивности -->
-    <script>
-        // --- 1. Управление таймлайном видео ---
-        const timelineVideo = document.getElementById('timeline-video');
-        const mainVideo = document.getElementById('project-video');
-        
-        function jumpToStage(seconds, element) {
-            timelineVideo.currentTime = seconds;
-            timelineVideo.play();
-            
-            mainVideo.currentTime = seconds;
-            mainVideo.play();
-
-            const buttons = document.querySelectorAll('.timeline-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
-        }
-
-        // Автоматическая подсветка кнопок при проигрывании видео
-        timelineVideo.addEventListener('timeupdate', () => {
-            const time = timelineVideo.currentTime;
-            const btn1 = document.getElementById('btn-stage-1');
-            const btn2 = document.getElementById('btn-stage-2');
-            const btn3 = document.getElementById('btn-stage-3');
-            
-            const buttons = [btn1, btn2, btn3];
-            
-            if (time < 4.0) {
-                if (!btn1.classList.contains('active')) {
-                    buttons.forEach(btn => btn.classList.remove('active'));
-                    btn1.classList.add('active');
-                }
-            } else if (time >= 4.0 && time < 8.0) {
-                if (!btn2.classList.contains('active')) {
-                    buttons.forEach(btn => btn.classList.remove('active'));
-                    btn2.classList.add('active');
-                }
-            } else {
-                if (!btn3.classList.contains('active')) {
-                    buttons.forEach(btn => btn.classList.remove('active'));
-                    btn3.classList.add('active');
-                }
-            }
-        });
-
-        // --- 2. Логика карусели презентации ---
-        const totalSlides = 12;
-        let currentSlideIndex = 0;
-        const slideImg = document.getElementById('carousel-slide-img');
-        const indicatorsContainer = document.getElementById('carousel-indicators-container');
-
-        // Создаем индикаторы
-        for (let i = 0; i < totalSlides; i++) {
-            const indicator = document.createElement('button');
-            indicator.classList.add('indicator');
-            if (i === 0) indicator.classList.add('active');
-            indicator.onclick = () => setSlide(i);
-            indicatorsContainer.appendChild(indicator);
-        }
-
-        function updateSlide() {
-            slideImg.style.opacity = 0.3;
-            setTimeout(() => {
-                slideImg.src = `slides/slide_${currentSlideIndex + 1}.png`;
-                slideImg.style.opacity = 1;
-            }, 150);
-
-            const indicators = document.querySelectorAll('.indicator');
-            indicators.forEach((ind, idx) => {
-                if (idx === currentSlideIndex) {
-                    ind.classList.add('active');
-                } else {
-                    ind.classList.remove('active');
-                }
-            });
-        }
-
-        function changeSlide(direction) {
-            currentSlideIndex += direction;
-            if (currentSlideIndex >= totalSlides) {
-                currentSlideIndex = 0;
-            } else if (currentSlideIndex < 0) {
-                currentSlideIndex = totalSlides - 1;
-            }
-            updateSlide();
-        }
-
-        function setSlide(index) {
-            currentSlideIndex = index;
-            updateSlide();
-        }
-
-        // --- 3. Мобильное меню (Гамбургер) ---
-        const menuToggle = document.getElementById('menu-toggle');
-        const navLinks = document.getElementById('nav-links');
-
-        menuToggle.addEventListener('click', () => {
-            const isOpen = navLinks.classList.contains('open');
-            toggleMenu(!isOpen);
-        });
-
-        function toggleMenu(open) {
-            if (open) {
-                navLinks.classList.add('open');
-                menuToggle.classList.add('open');
-            } else {
-                navLinks.classList.remove('open');
-                menuToggle.classList.remove('open');
-            }
-        }
-    </script>
+    <script src="script.js" defer></script>
 </body>
 </html>

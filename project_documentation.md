@@ -54,9 +54,9 @@ To achieve a premium visual aesthetic, four custom PBR (Physically Based Renderi
 
 The scene features a continuous, multi-stage animation sequence designed to showcase the model dynamically:
 
-### Stage 1: Staggered Assembly (Frames 1–120)
+### Stage 1: Staggered Assembly (Frames 1–110)
 *   **Roof Slab**: Scales up from 0 to 1 (Frames 1 to 20) with ease-in/ease-out interpolation.
-*   **Solar Panels**: Appear in a staggered, sequential grid layout (starting from the bottom-left panel and moving to the top-right).
+*   **Solar Panels**: Appear in a staggered, sequential grid layout (sorted bottom-to-top, left-to-right).
     *   Each panel stays invisible (Scale: 0) until its staggered start frame ($20 + i \times 5$, where $i$ is the panel index).
     *   Each panel takes 15 frames to smoothly scale up to 1, creating a growing/assembling effect.
     *   All 15 panels are fully assembled and settled by frame 110.
@@ -80,7 +80,7 @@ The scene features a continuous, multi-stage animation sequence designed to show
 
 The project has been optimized to render high-quality images in the **Cycles** path-tracing engine as fast as possible on an **NVIDIA GeForce RTX 3050** GPU:
 
-*   **OptiX Compute Backend**: Switch Blender's preference from CUDA to **OptiX** and activate the GPU. OptiX uses hardware-accelerated RT cores on RTX cards, rendering significantly faster than CUDA.
+*   **GPU Compute Backend**: Automatically selects the best available backend (**OptiX**, **CUDA**, **HIP**, or **Metal**) and enables all compatible GPUs. RTX cards benefit from hardware-accelerated ray tracing via OptiX.
 *   **Denoising (OpenImageDenoise)**: Denoising is enabled for final renders.
 *   **Adaptive Sampling**: Enables Blender to stop rendering pixels that have already become clean and noise-free.
 *   **Max Samples**: Reduced from **4096 to 256**.

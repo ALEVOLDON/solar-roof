@@ -494,8 +494,31 @@ section:last-of-type {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    transition: opacity 0.2s ease-in-out;
+    will-change: transform, opacity;
 }
+
+/* --- Slide transition keyframes --- */
+@keyframes slideOutLeft {
+    from { opacity: 1; transform: translateX(0)     scale(1);    }
+    to   { opacity: 0; transform: translateX(-48px) scale(0.97); }
+}
+@keyframes slideOutRight {
+    from { opacity: 1; transform: translateX(0)    scale(1);    }
+    to   { opacity: 0; transform: translateX(48px) scale(0.97); }
+}
+@keyframes slideInFromRight {
+    from { opacity: 0; transform: translateX(48px) scale(0.97); }
+    to   { opacity: 1; transform: translateX(0)    scale(1);    }
+}
+@keyframes slideInFromLeft {
+    from { opacity: 0; transform: translateX(-48px) scale(0.97); }
+    to   { opacity: 1; transform: translateX(0)     scale(1);    }
+}
+
+.slide-out-left  { animation: slideOutLeft     0.22s cubic-bezier(0.4, 0, 0.6, 1) forwards; }
+.slide-out-right { animation: slideOutRight    0.22s cubic-bezier(0.4, 0, 0.6, 1) forwards; }
+.slide-in-right  { animation: slideInFromRight 0.30s cubic-bezier(0.2, 0, 0.2, 1) forwards; }
+.slide-in-left   { animation: slideInFromLeft  0.30s cubic-bezier(0.2, 0, 0.2, 1) forwards; }
 
 /* Navigation Arrows */
 .carousel-btn {

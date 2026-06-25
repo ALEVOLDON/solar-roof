@@ -52,37 +52,75 @@ function updateTimelineButtons(time) {
     activeButton.setAttribute('aria-selected', 'true');
 }
 
+// Track the last navigation direction so animations know which way to fly
+let slideDirection = 1; // 1 = forward (→), -1 = backward (←)
+let isAnimating = false;
+
 function updateSlide() {
-    if (!slideImg) return;
+    if (!slideImg || isAnimating) return;
+    isAnimating = true;
 
-    // 1. Fade out completely
-    slideImg.style.opacity = '0';
-    
-    // 2. Wait for the transition to finish (matching the 0.2s CSS transition)
-    window.setTimeout(() => {
-        // 3. Change image src to load the new slide
-        slideImg.src = getSlidePath(currentSlideIndex);
-        slideImg.alt = `Слайд презентации проекта ${currentSlideIndex + 1} из ${TOTAL_SLIDES}`;
-        
-        // 4. Fade back in only after the browser has fully loaded the new image
-        slideImg.onload = () => {
-            slideImg.style.opacity = '1';
-            slideImg.onload = null; // Clear listener
-        };
-    }, 200);
+    const outClass = slideDirection > 0 ? 'slide-out-left'  : 'slide-out-right';
+    const inClass  = slideDirection > 0 ? 'slide-in-right'  : 'slide-in-left';
 
+    // Update dot indicators immediately (no need to wait for animation)
     document.querySelectorAll('.indicator').forEach((indicator, index) => {
         indicator.classList.toggle('active', index === currentSlideIndex);
         indicator.setAttribute('aria-selected', index === currentSlideIndex ? 'true' : 'false');
     });
+
+    // Skip animation when reduced motion is preferred
+    if (prefersReducedMotion) {
+        slideImg.src = getSlidePath(currentSlideIndex);
+        slideImg.alt = `Слайд презентации проекта ${currentSlideIndex + 1} из ${TOTAL_SLIDES}`;
+        isAnimating = false;
+        return;
+    }
+
+    // Step 1: animate current slide out
+    slideImg.classList.add(outClass);
+
+    slideImg.addEventListener('animationend', () => {
+        slideImg.classList.remove(outClass);
+
+        // Step 2: swap image source
+        slideImg.src = getSlidePath(currentSlideIndex);
+        slideImg.alt = `Слайд презентации проекта ${currentSlideIndex + 1} из ${TOTAL_SLIDES}`;
+
+        const animateIn = () => {
+            slideImg.classList.add(inClass);
+            slideImg.addEventListener('animationend', () => {
+                slideImg.classList.remove(inClass);
+                isAnimating = false;
+            }, { once: true });
+        };
+
+        // Step 3: animate in — handle both cached and fresh images
+        if (slideImg.complete && slideImg.naturalWidth > 0) {
+            animateIn();
+        } else {
+            slideImg.onload = () => {
+                slideImg.onload = null;
+                animateIn();
+            };
+            // Safety fallback if load event never fires (e.g. error)
+            slideImg.onerror = () => {
+                slideImg.onerror = null;
+                isAnimating = false;
+            };
+        }
+    }, { once: true });
 }
 
 function changeSlide(direction) {
+    slideDirection = direction;
     currentSlideIndex = (currentSlideIndex + direction + TOTAL_SLIDES) % TOTAL_SLIDES;
     updateSlide();
 }
 
 function setSlide(index) {
+    // Determine direction from current position so the animation feels natural
+    slideDirection = index > currentSlideIndex ? 1 : -1;
     currentSlideIndex = index;
     updateSlide();
 }

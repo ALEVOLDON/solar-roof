@@ -6,17 +6,105 @@ const STAGE_MARKERS = [
 ];
 
 const projectVideo = document.getElementById('project-video');
-const slideImg = document.getElementById('carousel-slide-img');
+const slideLayerA = document.getElementById('carousel-slide-a');
+const slideLayerB = document.getElementById('carousel-slide-b');
 const indicatorsContainer = document.getElementById('carousel-indicators-container');
 const menuToggle = document.getElementById('menu-toggle');
 const navLinks = document.getElementById('nav-links');
 
 let currentSlideIndex = 0;
+let activeLayer = slideLayerA;
+let idleLayer = slideLayerB;
+let isTransitioning = false;
 let prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+const slideCache = new Map();
+
 function getSlidePath(index) {
-    const slideNumber = index + 1;
-    return `slides/slide_${slideNumber}.webp`;
+    return `slides/slide_${index + 1}.webp`;
+}
+
+function updateIndicators(index) {
+    document.querySelectorAll('.indicator').forEach((indicator, indicatorIndex) => {
+        const isActive = indicatorIndex === index;
+        indicator.classList.toggle('active', isActive);
+        indicator.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+}
+
+async function loadSlideIntoImage(image, src, alt) {
+    if (slideCache.has(src)) {
+        image.src = src;
+        image.alt = alt;
+        return;
+    }
+
+    const preload = new Image();
+    preload.src = src;
+
+    try {
+        await preload.decode();
+    } catch {
+        // decode() is not supported everywhere; the browser will still paint eventually
+    }
+
+    image.src = src;
+    image.alt = alt;
+    slideCache.set(src, true);
+}
+
+function swapLayers() {
+    const previousActive = activeLayer;
+    activeLayer = idleLayer;
+    idleLayer = previousActive;
+}
+
+function showSlide(index) {
+    if (!activeLayer || !idleLayer || isTransitioning) return;
+
+    const newSrc = getSlidePath(index);
+    const newAlt = `Слайд презентации проекта ${index + 1} из ${TOTAL_SLIDES}`;
+
+    if (activeLayer.src.includes(newSrc)) {
+        updateIndicators(index);
+        return;
+    }
+
+    isTransitioning = true;
+    updateIndicators(index);
+
+    loadSlideIntoImage(idleLayer, newSrc, newAlt).then(() => {
+        idleLayer.classList.add('is-visible');
+
+        if (prefersReducedMotion) {
+            activeLayer.classList.remove('is-visible');
+            swapLayers();
+            isTransitioning = false;
+            return;
+        }
+
+        let finished = false;
+        const finish = () => {
+            if (finished) return;
+            finished = true;
+            activeLayer.classList.remove('is-visible');
+            swapLayers();
+            isTransitioning = false;
+        };
+
+        idleLayer.addEventListener('transitionend', finish, { once: true });
+        window.setTimeout(finish, 280);
+    });
+}
+
+function changeSlide(direction) {
+    currentSlideIndex = (currentSlideIndex + direction + TOTAL_SLIDES) % TOTAL_SLIDES;
+    showSlide(currentSlideIndex);
+}
+
+function setSlide(index) {
+    currentSlideIndex = index;
+    showSlide(currentSlideIndex);
 }
 
 function jumpToStage(seconds, element) {
@@ -52,92 +140,6 @@ function updateTimelineButtons(time) {
     activeButton.setAttribute('aria-selected', 'true');
 }
 
-// Track the last navigation direction so animations know which way to fly
-let slideDirection = 1; // 1 = forward (→), -1 = backward (←)
-let isAnimating = false;
-
-function updateSlide() {
-    if (!slideImg || isAnimating) return;
-    isAnimating = true;
-
-    const outClass = slideDirection > 0 ? 'slide-out-left'  : 'slide-out-right';
-    const inClass  = slideDirection > 0 ? 'slide-in-right'  : 'slide-in-left';
-    const newSrc   = getSlidePath(currentSlideIndex);
-    const newAlt   = `Слайд презентации проекта ${currentSlideIndex + 1} из ${TOTAL_SLIDES}`;
-
-    // Update dot indicators immediately
-    document.querySelectorAll('.indicator').forEach((indicator, index) => {
-        indicator.classList.toggle('active', index === currentSlideIndex);
-        indicator.setAttribute('aria-selected', index === currentSlideIndex ? 'true' : 'false');
-    });
-
-    if (prefersReducedMotion) {
-        slideImg.src = newSrc;
-        slideImg.alt = newAlt;
-        isAnimating = false;
-        return;
-    }
-
-    // --- Key fix for Android jank ---
-    // Pre-decode the next image in a background thread WHILE the exit animation runs.
-    // By the time the exit animation finishes, the image is already decoded and
-    // setting img.src won't block the main thread.
-    const preloadImg = new Image();
-    preloadImg.src = newSrc;
-    const imageReady = preloadImg.decode().catch(() => { /* ignore decode errors */ });
-
-    // Start exit animation
-    slideImg.classList.add(outClass);
-
-    // Wait for exit animation to finish (with a timeout safety net for Android)
-    const animOutDone = new Promise(resolve => {
-        const timer = setTimeout(resolve, 300); // fallback if animationend doesn't fire
-        slideImg.addEventListener('animationend', () => {
-            clearTimeout(timer);
-            resolve();
-        }, { once: true });
-    });
-
-    // Only proceed when BOTH: exit animation done AND image decoded
-    Promise.all([animOutDone, imageReady]).then(() => {
-        slideImg.classList.remove(outClass);
-        slideImg.src = newSrc;
-        slideImg.alt = newAlt;
-
-        // Double rAF: first frame commits the src swap to layout,
-        // second frame starts the entrance animation cleanly
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                slideImg.classList.add(inClass);
-
-                const timer = setTimeout(() => {
-                    slideImg.classList.remove(inClass);
-                    isAnimating = false;
-                }, 400); // fallback
-
-                slideImg.addEventListener('animationend', () => {
-                    clearTimeout(timer);
-                    slideImg.classList.remove(inClass);
-                    isAnimating = false;
-                }, { once: true });
-            });
-        });
-    });
-}
-
-function changeSlide(direction) {
-    slideDirection = direction;
-    currentSlideIndex = (currentSlideIndex + direction + TOTAL_SLIDES) % TOTAL_SLIDES;
-    updateSlide();
-}
-
-function setSlide(index) {
-    // Determine direction from current position so the animation feels natural
-    slideDirection = index > currentSlideIndex ? 1 : -1;
-    currentSlideIndex = index;
-    updateSlide();
-}
-
 function toggleMenu(open) {
     if (!navLinks || !menuToggle) return;
 
@@ -148,14 +150,15 @@ function toggleMenu(open) {
 }
 
 function preloadSlides() {
-    // Don't preload unnecessarily when the user has requested reduced data usage
-    if (prefersReducedMotion) return;
-
-    const preloadedImages = [];
     for (let index = 0; index < TOTAL_SLIDES; index += 1) {
+        const src = getSlidePath(index);
         const img = new Image();
-        img.src = getSlidePath(index);
-        preloadedImages.push(img);
+        img.src = src;
+        img.decode?.().then(() => {
+            slideCache.set(src, true);
+        }).catch(() => {
+            slideCache.set(src, true);
+        });
     }
 }
 
@@ -166,15 +169,15 @@ function initTouchSwipe() {
     let startX = 0;
     let startY = 0;
 
-    container.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
+    container.addEventListener('touchstart', (event) => {
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
     }, { passive: true });
 
-    container.addEventListener('touchend', (e) => {
-        const dx = e.changedTouches[0].clientX - startX;
-        const dy = e.changedTouches[0].clientY - startY;
-        // Swipe only if horizontal movement > 50px and more horizontal than vertical
+    container.addEventListener('touchend', (event) => {
+        const dx = event.changedTouches[0].clientX - startX;
+        const dy = event.changedTouches[0].clientY - startY;
+
         if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
             changeSlide(dx < 0 ? 1 : -1);
         }
@@ -198,7 +201,6 @@ function initCarousel() {
 
     document.getElementById('carousel-prev-btn')?.addEventListener('click', () => changeSlide(-1));
     document.getElementById('carousel-next-btn')?.addEventListener('click', () => changeSlide(1));
-    updateSlide();
 }
 
 function initVideo() {

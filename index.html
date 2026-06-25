@@ -128,15 +128,27 @@
                 <button class="carousel-btn carousel-prev" id="carousel-prev-btn" type="button" aria-label="Предыдущий слайд">&#10094;</button>
 
                 <div class="slide-frame glass-panel">
-                    <img
-                        id="carousel-slide-img"
-                        src="slides/slide_1.webp"
-                        alt="Слайд презентации проекта 1 из 12"
-                        width="1920"
-                        height="1080"
-                        loading="eager"
-                        decoding="async"
-                    >
+                    <div class="slide-stack" aria-live="polite">
+                        <img
+                            id="carousel-slide-a"
+                            class="slide-layer is-visible"
+                            src="slides/slide_1.webp"
+                            alt="Слайд презентации проекта 1 из 12"
+                            width="1920"
+                            height="1080"
+                            loading="eager"
+                            decoding="sync"
+                        >
+                        <img
+                            id="carousel-slide-b"
+                            class="slide-layer"
+                            alt=""
+                            width="1920"
+                            height="1080"
+                            loading="eager"
+                            decoding="sync"
+                        >
+                    </div>
                 </div>
 
                 <button class="carousel-btn carousel-next" id="carousel-next-btn" type="button" aria-label="Следующий слайд">&#10095;</button>

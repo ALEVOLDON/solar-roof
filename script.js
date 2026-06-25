@@ -55,12 +55,21 @@ function updateTimelineButtons(time) {
 function updateSlide() {
     if (!slideImg) return;
 
-    slideImg.style.opacity = '0.3';
+    // 1. Fade out completely
+    slideImg.style.opacity = '0';
+    
+    // 2. Wait for the transition to finish (matching the 0.2s CSS transition)
     window.setTimeout(() => {
+        // 3. Change image src to load the new slide
         slideImg.src = getSlidePath(currentSlideIndex);
         slideImg.alt = `Слайд презентации проекта ${currentSlideIndex + 1} из ${TOTAL_SLIDES}`;
-        slideImg.style.opacity = '1';
-    }, 150);
+        
+        // 4. Fade back in only after the browser has fully loaded the new image
+        slideImg.onload = () => {
+            slideImg.style.opacity = '1';
+            slideImg.onload = null; // Clear listener
+        };
+    }, 200);
 
     document.querySelectorAll('.indicator').forEach((indicator, index) => {
         indicator.classList.toggle('active', index === currentSlideIndex);

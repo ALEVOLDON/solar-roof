@@ -21,7 +21,7 @@ let prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 const slideCache = new Map();
 
 function getSlidePath(index) {
-    return `slides/slide_${index + 1}.webp`;
+    return `assets/slides/slide_${index + 1}.webp`;
 }
 
 function updateIndicators(index) {

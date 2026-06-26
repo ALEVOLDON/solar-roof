@@ -2,13 +2,13 @@
 
 🌐 **Живое демо:** [alevoldon.github.io/solar-roof](https://alevoldon.github.io/solar-roof/)
 
-![Превью проекта Solaris](render/video_poster.webp)
+![Превью проекта Solaris](assets/render/video_poster.webp)
 
 Интерактивная 3D-презентация и автоматизированная визуализация плоской бетонной крыши с оптимизированной сеткой солнечных панелей.
 
 Проект разработан программно с использованием Python API для Blender, анимирован для демонстрации клиенту и оформлен в виде премиального веб-лендинга.
 
-📄 **Техническая документация (EN):** [project_documentation.md](project_documentation.md)
+📄 **Техническая документация (EN):** [project_documentation.md](docs/project_documentation.md)
 
 ---
 
@@ -58,21 +58,28 @@
 
 ```text
 solar_roof/
-├── generate_solar_roof.py              # Python-скрипт генерации сцены в Blender
-├── solar_roof.blend                    # Файл проекта Blender
-├── index.html                          # Интерактивный лендинг
-├── style.css                           # Стили и адаптивность
-├── script.js                           # Логика плеера, карусели и меню
-├── favicon.svg                         # Иконка сайта
-├── project_documentation.md            # Техническая документация (EN)
-├── LICENSE                             # MIT License
-├── Programmatic_Solar_Photorealism.pptx
-├── Programmatic_Solar_Photorealism.pdf
-├── slides/                             # Слайды (PNG + WebP)
-└── render/
-    ├── solar_roof_0001-0360.mp4       # Отрендеренная анимация (12 сек, H.264)
-    ├── video_poster.webp               # Превью-кадр из анимации (WebP, ~16 КБ)
-    └── video_poster.jpg                # Превью-кадр из анимации (JPEG, fallback)
+├── index.html                    # Интерактивный лендинг
+├── LICENSE                       # MIT License
+├── README.md                     # Описание проекта
+├── assets/                       # Ассеты веб-страницы
+│   ├── css/
+│   │   └── style.css             # Стили и адаптивность
+│   ├── js/
+│   │   └── script.js             # Логика плеера, карусели и меню
+│   ├── images/
+│   │   └── favicon.svg           # Иконка сайта
+│   ├── render/                   # Отрендеренные медиа-файлы
+│   │   ├── solar_roof_0001-0360.mp4
+│   │   ├── video_poster.jpg
+│   │   └── video_poster.webp
+│   └── slides/                   # Слайды презентации (PNG + WebP)
+├── blender/                      # 3D-моделирование в Blender
+│   ├── generate_solar_roof.py    # Python-скрипт генерации сцены
+│   └── solar_roof.blend          # Файл проекта Blender
+└── docs/                         # Документация и презентации
+    ├── project_documentation.md  # Техническая документация (EN)
+    ├── Programmatic_Solar_Photorealism.pdf
+    └── Programmatic_Solar_Photorealism.pptx
 ```
 
 ---
@@ -82,11 +89,11 @@ solar_roof/
 ### Запуск генерации в Blender
 
 1. Откройте Blender 4.x / 5.x.
-2. Перейдите на вкладку **Scripting** и откройте `generate_solar_roof.py`.
+2. Перейдите на вкладку **Scripting** и откройте `blender/generate_solar_roof.py`.
 3. Нажмите **Run Script** или выполните в терминале:
 
    ```bash
-   blender --background --python generate_solar_roof.py
+   blender --background --python blender/generate_solar_roof.py
    ```
 
 4. Нажмите **Пробел** на таймлайне для воспроизведения анимации.

@@ -92,7 +92,7 @@ The project has been optimized to render high-quality images in the **Cycles** p
 
 ## 6. How to Run and View the Project
 
-1.  Execute the Python script `generate_solar_roof.py` inside Blender's Scripting tab (or run it via command line).
+1.  Execute the Python script `blender/generate_solar_roof.py` inside Blender's Scripting tab (or run it via command line).
 2.  The script generates all geometry, textures, lighting, camera rigs, and sets up keyframes.
 3.  Press **Spacebar** in the Timeline to play the animation.
 4.  Switch viewport shading to **Rendered** (hotkey `Z` > `Rendered`) to see the lighting, materials, and moving shadows in real-time.

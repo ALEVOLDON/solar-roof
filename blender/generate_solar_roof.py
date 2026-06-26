@@ -523,7 +523,7 @@ def configure_render_settings() -> None:
     scene.render.ffmpeg.format = "MPEG4"
     scene.render.ffmpeg.codec = "H264"
     scene.render.ffmpeg.constant_rate_factor = "HIGH"
-    scene.render.filepath = os.path.join(script_dir, "render", "solar_roof_")
+    scene.render.filepath = os.path.join(script_dir, "..", "assets", "render", "solar_roof_")
 
     try:
         preferences = bpy.context.preferences
